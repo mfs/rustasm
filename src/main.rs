@@ -50,21 +50,19 @@ impl Assembler {
             op_code_table: HashMap::new(),
         };
 
-        a.op_code_table.insert(
-            Mnemonic { mnemonic: "syscall", mnemonic_type: OpCodeType::None },
-            OpCode {code: vec![0x0f, 0x05], length: 2}
-        );
+        {
+            let mut add = | mnemonic, mnemonic_type, code, length | {
+                a.op_code_table.insert(
+                    Mnemonic { mnemonic: mnemonic, mnemonic_type: mnemonic_type },
+                    OpCode {code: code, length: length}
+                );
+            };
 
-        a.op_code_table.insert(
-            Mnemonic { mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg32, Imm32) },
-            OpCode {code: vec![0xb8], length: 5}
-        );
+            add("syscall", OpCodeType::None, vec![0x5], 2);
+            add("mov", OpCodeType::Type(Reg32, Imm32), vec![0xb8], 5);
+            add("mov", OpCodeType::Type(Reg64, Imm64), vec![0x48, 0xbe], 10);
 
-        a.op_code_table.insert(
-            Mnemonic { mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg64, Imm64) },
-            OpCode {code: vec![0x48, 0xbe], length: 10}
-        );
-
+        }
         a
     }
 
