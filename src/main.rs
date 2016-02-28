@@ -60,6 +60,11 @@ impl Assembler {
             OpCode {code: vec![0xb8], length: 5}
         );
 
+        a.op_code_table.insert(
+            Mnemonic { mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg64, Imm64) },
+            OpCode {code: vec![0x48, 0xbe], length: 10}
+        );
+
         a
     }
 
@@ -78,5 +83,6 @@ fn main() {
 
     assembler.list(Mnemonic{ mnemonic: "syscall", mnemonic_type: OpCodeType::None });
     assembler.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg32, Imm32) });
+    assembler.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg64, Imm64) });
 
 }
