@@ -1,4 +1,7 @@
+mod symbol_table;
+
 use std::collections::HashMap;
+use symbol_table::SymbolTable;
 
 use OperandType::*;
 
@@ -37,15 +40,10 @@ struct OpCode {
     length: usize
 }
 
-struct Symbol {
-    value: u64,
-    //type
-}
-
 struct Assembler {
     _location_counter: u64,
     op_code_table: HashMap<Mnemonic, OpCode>,
-    symbol_table: HashMap<String, Symbol>
+    symbol_table: SymbolTable,
 }
 
 impl Assembler {
@@ -53,7 +51,7 @@ impl Assembler {
         let mut a = Assembler {
             _location_counter: 0,
             op_code_table: HashMap::new(),
-            symbol_table: HashMap::new(),
+            symbol_table: SymbolTable::new(),
         };
 
         {
