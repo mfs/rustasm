@@ -37,10 +37,15 @@ struct OpCode {
     length: usize
 }
 
+struct Symbol {
+    value: u64,
+    //type
+}
+
 struct Assembler {
     _location_counter: u64,
     op_code_table: HashMap<Mnemonic, OpCode>,
-    //symbol_table
+    symbol_table: HashMap<String, Symbol>
 }
 
 impl Assembler {
@@ -48,6 +53,7 @@ impl Assembler {
         let mut a = Assembler {
             _location_counter: 0,
             op_code_table: HashMap::new(),
+            symbol_table: HashMap::new(),
         };
 
         {
@@ -66,6 +72,16 @@ impl Assembler {
         a
     }
 
+    fn pass1(&mut self) {
+        self.list(Mnemonic{ mnemonic: "syscall", mnemonic_type: OpCodeType::None });
+        self.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg32, Imm32) });
+        self.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg64, Imm64) });
+    }
+
+    fn pass2(&mut self) {
+
+    }
+
     fn list(&self, mnemonic: Mnemonic) {
         let op = self.op_code_table.get(&mnemonic).unwrap();
 
@@ -77,10 +93,10 @@ impl Assembler {
 
 fn main() {
 
-    let assembler = Assembler::new();
+    let mut assembler = Assembler::new();
 
-    assembler.list(Mnemonic{ mnemonic: "syscall", mnemonic_type: OpCodeType::None });
-    assembler.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg32, Imm32) });
-    assembler.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg64, Imm64) });
+    assembler.pass1();
+    assembler.pass2();
+
 
 }
