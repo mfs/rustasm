@@ -1,48 +1,14 @@
 mod symbol_table;
+mod opcode_table;
 
 use std::collections::HashMap;
 use symbol_table::SymbolTable;
-
-use OperandType::*;
-
-#[derive(PartialEq,Eq,Hash)]
-enum OperandType {
-    Imm8,
-    Imm16,
-    Imm32,
-    Imm64,
-
-    Reg8,
-    Reg16,
-    Reg32,
-    Reg64,
-
-    Mem8,
-    Mem16,
-    Mem32,
-    Mem64,
-}
-
-#[derive(PartialEq,Eq,Hash)]
-enum OpCodeType {
-    None,
-    Type(OperandType, OperandType),
-}
-
-#[derive(PartialEq,Eq,Hash)]
-struct Mnemonic {
-    mnemonic: &'static str,
-    mnemonic_type: OpCodeType
-}
-
-struct OpCode {
-    code: Vec<u8>,
-    length: usize
-}
+use opcode_table::{OpCodeTable, OpCodeType, Mnemonic};
+use opcode_table::OperandType::*;
 
 struct Assembler {
     _location_counter: u64,
-    op_code_table: HashMap<Mnemonic, OpCode>,
+    op_code_table: OpCodeTable, //HashMap<Mnemonic, OpCode>,
     symbol_table: SymbolTable,
 }
 
@@ -50,23 +16,14 @@ impl Assembler {
     fn new() -> Assembler {
         let mut a = Assembler {
             _location_counter: 0,
-            op_code_table: HashMap::new(),
+            op_code_table: OpCodeTable::new(),
             symbol_table: SymbolTable::new(),
         };
 
-        {
-            let mut add = | mnemonic, mnemonic_type, code, length | {
-                a.op_code_table.insert(
-                    Mnemonic { mnemonic: mnemonic, mnemonic_type: mnemonic_type },
-                    OpCode {code: code, length: length}
-                );
-            };
+        a.op_code_table.insert("syscall", OpCodeType::None, vec![0x5], 2);
+        a.op_code_table.insert("mov", OpCodeType::Type(Reg32, Imm32), vec![0xb8], 5);
+        a.op_code_table.insert("mov", OpCodeType::Type(Reg64, Imm64), vec![0x48, 0xbe], 10);
 
-            add("syscall", OpCodeType::None, vec![0x5], 2);
-            add("mov", OpCodeType::Type(Reg32, Imm32), vec![0xb8], 5);
-            add("mov", OpCodeType::Type(Reg64, Imm64), vec![0x48, 0xbe], 10);
-
-        }
         a
     }
 
