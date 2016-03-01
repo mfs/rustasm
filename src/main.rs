@@ -43,6 +43,10 @@ impl Assembler {
         println!("mnemonic: {} | op_code: {:?} | length: {}",
                  mnemonic.mnemonic, op.code, op.length);
     }
+
+    fn lexer(&self, line: &str)  {
+        // TODO
+    }
 }
 
 
@@ -53,5 +57,7 @@ fn main() {
     assembler.pass1();
     assembler.pass2();
 
-
+    // label:    instruction operands        ; comment
+    let line = "fadd    st1,st0         ; this sets st1 := st1 + st0";
+    assembler.lexer(line)
 }
