@@ -36,9 +36,9 @@ named!( line_asm<Line>,
     chain!(
         label: label ~
         space? ~
-        i: instruction,
+        instruction: instruction,
         || { Line::new( Some(str::from_utf8(label).unwrap() ),
-                        Some(str::from_utf8(i).unwrap())) }
+                        Some(str::from_utf8(instruction).unwrap())) }
     )
 );
 
