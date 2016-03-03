@@ -2,7 +2,7 @@
 extern crate nom;
 
 use std::str;
-use nom::{space, is_alphanumeric};
+use nom::{space, is_alphanumeric, line_ending};
 
 named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
 
@@ -16,17 +16,20 @@ named!( operands, take_until_either!( b";\n" ) );
 struct Line<'a> {
     label: Option<&'a str>,
     instruction: Option<&'a str>,
-    operand: Option<String>,
-    comment: Option<String>
+    operand: Option<&'a str>,
+    comment: Option<&'a str>
 }
 
 impl<'a> Line<'a> {
-    fn new(label: Option<&'a str>, instruction: Option<&'a str>) -> Line<'a> {
+    fn new(label: Option<&'a str>,
+           instruction: Option<&'a str>,
+           operands: Option<&'a str>,
+           comment: Option<&'a str>) -> Line<'a> {
         Line {
             label: label,
             instruction: instruction,
-            operand: None,
-            comment: None,
+            operand: operands,
+            comment: comment,
         }
     }
 
@@ -36,9 +39,15 @@ named!( line_asm<Line>,
     chain!(
         label: label ~
         space? ~
-        instruction: instruction,
+        instruction: instruction ~
+        space? ~
+        operands: operands ~
+        comment: comment ~
+        line_ending,
         || { Line::new( Some(str::from_utf8(label).unwrap() ),
-                        Some(str::from_utf8(instruction).unwrap())) }
+                        Some(str::from_utf8(instruction).unwrap()),
+                        Some(str::from_utf8(operands).unwrap()),
+                        Some(str::from_utf8(comment).unwrap())) }
     )
 );
 
@@ -48,7 +57,7 @@ fn main() {
 
     let b = line_asm(line);
 
-    println!("{:?}", b);
+    println!("{:#?}", b);
 
 }
 
