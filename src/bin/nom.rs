@@ -4,6 +4,12 @@ extern crate nom;
 use std::str;
 use nom::{space, is_alphanumeric, line_ending};
 
+// types of input lines these can all have comments too.
+// empty
+// label
+// instruction operands?
+// label instructions operands?
+
 named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
 
 named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
@@ -21,15 +27,15 @@ struct Line<'a> {
 }
 
 impl<'a> Line<'a> {
-    fn new(label: Option<&'a str>,
-           instruction: Option<&'a str>,
-           operands: Option<&'a str>,
-           comment: Option<&'a str>) -> Line<'a> {
+    fn new(label: Option<&'a [u8]>,
+           instruction: Option<&'a [u8]>,
+           operands: Option<&'a [u8]>,
+           comment: Option<&'a [u8]>) -> Line<'a> {
         Line {
-            label: label,
-            instruction: instruction,
-            operand: operands,
-            comment: comment,
+            label: label.map(|x| str::from_utf8(x).unwrap()),
+            instruction: instruction.map(|x| str::from_utf8(x).unwrap()),
+            operand: operands.map(|x| str::from_utf8(x).unwrap()),
+            comment: comment.map(|x| str::from_utf8(x).unwrap()),
         }
     }
 
@@ -41,13 +47,13 @@ named!( line_asm<Line>,
         space? ~
         instruction: instruction ~
         space? ~
-        operands: operands ~
+        operands: operands? ~
         comment: comment ~
         line_ending,
-        || { Line::new( Some(str::from_utf8(label).unwrap() ),
-                        Some(str::from_utf8(instruction).unwrap()),
-                        Some(str::from_utf8(operands).unwrap()),
-                        Some(str::from_utf8(comment).unwrap())) }
+        || { Line::new( Some(label),
+                        Some(instruction),
+                        operands,
+                        Some(comment)) }
     )
 );
 
