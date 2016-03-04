@@ -2,3 +2,4 @@ target
 asm/hello_world
 asm/hello_world.lst
 asm/hello_world.o
+*.swp
