@@ -34,7 +34,21 @@ impl<'a> Line<'a> {
 }
 
 named!( line_asm<Line>,
-    alt!(line_label | label_instruction_operands)
+    alt!(line_instruction_operands | line_label | label_instruction_operands)
+);
+
+named!( line_instruction_operands<Line>,
+    chain!(
+        instruction: instruction ~
+        space? ~
+        operands: operands? ~
+        comment: comment ~
+        line_ending,
+        || { Line::new( None,
+                        Some(instruction),
+                        operands,
+                        Some(comment)) }
+    )
 );
 
 named!( line_label<Line>,
@@ -84,6 +98,7 @@ fn main() {
         "start                        ; (1) label only\n",
         "start mov    st1,st0         ; (2) this sets st1 := st0\n",
         "start syscall                ; (3) perform syscall\n",
+        "syscall                      ; (4) perform syscall\n",
     ];
 
     for line in lines {
