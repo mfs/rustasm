@@ -34,10 +34,10 @@ impl<'a> Line<'a> {
 }
 
 named!( line_asm<Line>,
-    alt!(instruction_operands)
+    alt!(label_instruction_operands)
 );
 
-named!( instruction_operands<Line>,
+named!( label_instruction_operands<Line>,
     chain!(
         label: label ~
         space? ~
