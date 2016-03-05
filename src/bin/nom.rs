@@ -34,8 +34,8 @@ impl<'a> Line<'a> {
         Line {
             label: label.map(|x| str::from_utf8(x).unwrap()),
             instruction: instruction.map(|x| str::from_utf8(x).unwrap()),
-            operand: operands.map(|x| str::from_utf8(x).unwrap()),
-            comment: comment.map(|x| str::from_utf8(x).unwrap()),
+            operand: operands.map(|x| str::from_utf8(x).unwrap().trim()),
+            comment: comment.map(|x| str::from_utf8(x).unwrap().trim()),
         }
     }
 
