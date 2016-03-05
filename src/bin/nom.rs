@@ -10,14 +10,6 @@ use nom::{space, is_alphanumeric, line_ending};
 // instruction operands?
 // label instructions operands?
 
-named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
-
-named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
-
-named!( label, take_while!( nom::is_alphanumeric ) );
-
-named!( operands, take_until_either!( b";\n" ) );
-
 #[derive(Debug)]
 struct Line<'a> {
     label: Option<&'a str>,
@@ -56,6 +48,18 @@ named!( line_asm<Line>,
                         Some(comment)) }
     )
 );
+
+// comments start with ';' and go to the end of the line
+named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
+
+// instruction TODO need to add all instructions
+named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
+
+// labels TODO add optional ':'
+named!( label, take_while!( is_alphanumeric ) );
+
+// operands TODO need to handle spaces, strings, etc
+named!( operands, take_until_either!( b";\n" ) );
 
 fn main() {
 
