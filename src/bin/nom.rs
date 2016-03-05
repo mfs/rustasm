@@ -34,7 +34,20 @@ impl<'a> Line<'a> {
 }
 
 named!( line_asm<Line>,
-    alt!(label_instruction_operands)
+    alt!(line_label | label_instruction_operands)
+);
+
+named!( line_label<Line>,
+    chain!(
+        label: label ~
+        space ~
+        comment: comment ~
+        line_ending,
+        || { Line::new( Some(label),
+                        None,
+                        None,
+                        Some(comment)) }
+    )
 );
 
 named!( label_instruction_operands<Line>,
@@ -67,11 +80,16 @@ named!( operands, take_until_either!( b";\n" ) );
 
 fn main() {
 
-    let line = b"start mov    st1,st0         ; this sets st1 := st1 + st0\n";
+    let lines = vec![
+        b"start                        ; (1) label only          \n",
+        b"start mov    st1,st0         ; (2) this sets st1 := st0\n",
+        b"start syscall                ; (3) perform syscall     \n",
+    ];
 
-    let b = line_asm(line);
-
-    println!("{:#?}", b);
+    for line in lines {
+        let asm = line_asm(line);
+        println!("{:#?}", asm);
+    }
 
 }
 
