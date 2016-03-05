@@ -33,9 +33,17 @@ impl<'a> Line<'a> {
 
 }
 
+///////////////////////////////////////////////////////////////////////
+// top level parser
+///////////////////////////////////////////////////////////////////////
+
 named!( line_asm<Line>,
-    alt!(line_instruction_operands | line_label | label_instruction_operands)
+    alt!(line_instruction_operands | line_label | line_label_instruction_operands)
 );
+
+///////////////////////////////////////////////////////////////////////
+// per line parsers
+///////////////////////////////////////////////////////////////////////
 
 named!( line_instruction_operands<Line>,
     chain!(
@@ -64,7 +72,7 @@ named!( line_label<Line>,
     )
 );
 
-named!( label_instruction_operands<Line>,
+named!( line_label_instruction_operands<Line>,
     chain!(
         label: label ~
         space? ~
@@ -79,6 +87,10 @@ named!( label_instruction_operands<Line>,
                         Some(comment)) }
     )
 );
+
+///////////////////////////////////////////////////////////////////////
+// base parsers
+///////////////////////////////////////////////////////////////////////
 
 // comments start with ';' and go to the end of the line
 named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
