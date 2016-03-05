@@ -38,12 +38,28 @@ impl<'a> Line<'a> {
 ///////////////////////////////////////////////////////////////////////
 
 named!( line_asm<Line>,
-    alt!(line_instruction_operands | line_label | line_label_instruction_operands)
+    alt!( line_comment |
+          line_instruction_operands |
+          line_label |
+          line_label_instruction_operands
+    )
 );
 
 ///////////////////////////////////////////////////////////////////////
 // per line parsers
 ///////////////////////////////////////////////////////////////////////
+
+named!( line_comment<Line>,
+    chain!(
+        space? ~
+        comment: comment ~
+        line_ending,
+        || { Line::new( None,
+                        None,
+                        None,
+                        Some(comment)) }
+    )
+);
 
 named!( line_instruction_operands<Line>,
     chain!(
@@ -107,6 +123,7 @@ named!( operands, take_until_either!( b";\n" ) );
 fn main() {
 
     let lines = vec![
+        "; comment only line\n",
         "start                        ; (1) label only\n",
         "start mov    st1,st0         ; (2) this sets st1 := st0\n",
         "start syscall                ; (3) perform syscall\n",
