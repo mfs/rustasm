@@ -110,7 +110,8 @@ fn main() {
         "start                        ; (1) label only\n",
         "start mov    st1,st0         ; (2) this sets st1 := st0\n",
         "start syscall                ; (3) perform syscall\n",
-        "syscall                      ; (4) perform syscall\n",
+        "mov    st1,st0               ; (4) this sets st1 := st0\n",
+        "syscall                      ; (5) perform syscall\n",
     ];
 
     for line in lines {
