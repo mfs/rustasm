@@ -81,13 +81,13 @@ named!( operands, take_until_either!( b";\n" ) );
 fn main() {
 
     let lines = vec![
-        b"start                        ; (1) label only          \n",
-        b"start mov    st1,st0         ; (2) this sets st1 := st0\n",
-        b"start syscall                ; (3) perform syscall     \n",
+        "start                        ; (1) label only\n",
+        "start mov    st1,st0         ; (2) this sets st1 := st0\n",
+        "start syscall                ; (3) perform syscall\n",
     ];
 
     for line in lines {
-        let asm = line_asm(line);
+        let asm = line_asm(line.as_bytes());
         println!("{:#?}", asm);
     }
 
