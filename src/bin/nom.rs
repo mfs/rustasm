@@ -114,8 +114,8 @@ named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
 // instruction TODO need to add all instructions
 named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
 
-// labels TODO add optional ':'
-named!( label, take_while!( is_alphanumeric ) );
+// labels TODO don't allow numeric first char
+named!( label, terminated!(take_while!( is_alphanumeric ), opt!(char!(':'))) );
 
 // operands TODO need to handle spaces, strings, etc
 named!( operands, take_until_either!( b";\n" ) );
@@ -126,7 +126,7 @@ fn main() {
         "; comment only line\n",
         "start                        ; (1) label only\n",
         "start mov    st1,st0         ; (2) this sets st1 := st0\n",
-        "start syscall                ; (3) perform syscall\n",
+        "start: syscall                ; (3) perform syscall\n",
         "mov    st1,st0               ; (4) this sets st1 := st0\n",
         "syscall                      ; (5) perform syscall\n",
     ];
