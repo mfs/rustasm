@@ -2,7 +2,7 @@
 extern crate nom;
 
 use std::str;
-use nom::{space, is_alphanumeric, line_ending};
+use nom::{space, is_alphanumeric, line_ending, IResult};
 
 // types of input lines these can all have comments too.
 // empty
@@ -10,7 +10,7 @@ use nom::{space, is_alphanumeric, line_ending};
 // instruction operands?
 // label instructions operands?
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 struct Line<'a> {
     label: Option<&'a str>,
     instruction: Option<&'a str>,
@@ -136,5 +136,29 @@ fn main() {
         println!("{:#?}", asm);
     }
 
+}
+
+#[test]
+fn test_comment() {
+    assert_eq!(line_asm(b"; a single comment\n"),
+        IResult::Done(&b""[..], Line {
+            label: None,
+            instruction: None,
+            operand: None,
+            comment: Some("a single comment")
+        })
+    );
+}
+
+#[test]
+fn test_comment_leading_whitespace() {
+    assert_eq!(line_asm(b" \t ; a single comment\n"),
+        IResult::Done(&b""[..], Line {
+            label: None,
+            instruction: None,
+            operand: None,
+            comment: Some("a single comment")
+        })
+    );
 }
 
