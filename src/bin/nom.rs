@@ -160,4 +160,17 @@ mod tests {
         assert_eq!(line_asm(b" \t ; a single comment\n"),
                    wrap_done(None, None, None, Some(b"a single comment")));
     }
+
+    #[test]
+    fn test_instruction() {
+        assert_eq!(line_asm(b"syscall ; instruction\n"),
+                   wrap_done(None, Some(b"syscall"), None, Some(b"single instruction") ));
+    }
+
+    #[test]
+    fn test_instruction_operand() {
+        assert_eq!(line_asm(b"mov rax,rbx ; instruction\n"),
+                   wrap_done(None, Some(b"mov"), Some(b"rax,rbx"), Some(b"instruction") ));
+    }
+
 }
