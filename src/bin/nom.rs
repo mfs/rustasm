@@ -173,4 +173,16 @@ mod tests {
                    wrap_done(None, Some(b"mov"), Some(b"rax,rbx"), Some(b"instruction") ));
     }
 
+    #[test]
+    fn test_label_instruction() {
+        assert_eq!(line_asm(b"start: syscall ; instruction\n"),
+                   wrap_done(Some(b"start"), Some(b"syscall"), None, Some(b"instruction") ));
+    }
+
+    #[test]
+    fn test_label_instruction_operand() {
+        assert_eq!(line_asm(b"start: mov rax,rbx ; instruction\n"),
+                   wrap_done(Some(b"start"), Some(b"mov"),
+                             Some(b"rax,rbx"), Some(b"instruction") ));
+    }
 }
