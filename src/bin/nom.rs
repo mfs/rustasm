@@ -2,7 +2,7 @@
 extern crate nom;
 
 use std::str;
-use nom::{space, is_alphanumeric, line_ending, IResult};
+use nom::{space, is_alphanumeric, line_ending};
 
 // types of input lines these can all have comments too.
 // empty
@@ -138,27 +138,26 @@ fn main() {
 
 }
 
-#[test]
-fn test_comment() {
-    assert_eq!(line_asm(b"; a single comment\n"),
-        IResult::Done(&b""[..], Line {
-            label: None,
-            instruction: None,
-            operand: None,
-            comment: Some("a single comment")
-        })
-    );
-}
+#[cfg(test)]
+mod tests {
+    use nom::IResult;
+    use super::{Line, line_asm};
+    fn wrap_done<'a>(label: Option<&'a [u8]>,
+                 instructions: Option<&'a [u8]>,
+                 operand: Option<&'a [u8]>,
+                 comment: Option<&'a [u8]>) -> IResult<&'a [u8], Line<'a> > {
+        IResult::Done(&b""[..], Line::new( label, instructions, operand, comment))
+    }
 
-#[test]
-fn test_comment_leading_whitespace() {
-    assert_eq!(line_asm(b" \t ; a single comment\n"),
-        IResult::Done(&b""[..], Line {
-            label: None,
-            instruction: None,
-            operand: None,
-            comment: Some("a single comment")
-        })
-    );
-}
+    #[test]
+    fn test_comment() {
+        assert_eq!(line_asm(b"; a single comment\n"),
+                   wrap_done(None, None, None, Some(b"a single comment")));
+    }
 
+    #[test]
+    fn test_comment_leading_whitespace() {
+        assert_eq!(line_asm(b" \t ; a single comment\n"),
+                   wrap_done(None, None, None, Some(b"a single comment")));
+    }
+}
