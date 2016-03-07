@@ -114,17 +114,8 @@ named!( line_label_instruction_operands<Line>,
 );
 
 ///////////////////////////////////////////////////////////////////////
-// base parsers
+// intermediate parsers
 ///////////////////////////////////////////////////////////////////////
-
-// comments start with ';' and go to the end of the line
-named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
-
-// instruction TODO need to add all instructions
-named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
-
-// labels TODO don't allow numeric first char
-named!( label, terminated!(take_while!( is_alphanumeric ), opt!(char!(':'))) );
 
 // operands TODO need to handle spaces, strings, etc
 named!( operands<Operand>,
@@ -145,6 +136,19 @@ named!(operand_register_pair<Operand>,
        || Operand::RegisterPair(String::from_utf8_lossy(r0).into_owned(),
                                 String::from_utf8_lossy(r1).into_owned()))
 );
+
+///////////////////////////////////////////////////////////////////////
+// base parsers
+///////////////////////////////////////////////////////////////////////
+
+// comments start with ';' and go to the end of the line
+named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
+
+// instruction TODO need to add all instructions
+named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
+
+// labels TODO don't allow numeric first char
+named!( label, terminated!(take_while!( is_alphanumeric ), opt!(char!(':'))) );
 
 // registers TODO segment, xmss, etc.
 named!(register, alt!(
