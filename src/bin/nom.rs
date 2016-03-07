@@ -40,6 +40,34 @@ enum Operand {
     // strings, literals, etc
 }
 
+enum Register {
+   RAX, RBX, RCX, RDX, RBP, RSP, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15
+}
+
+impl Register {
+   fn from_bytes(x: &[u8]) -> Register {
+      match x {
+         b"rax" => Register::RAX,
+         b"rbx" => Register::RBX,
+         b"rcx" => Register::RCX,
+         b"rdx" => Register::RDX,
+         b"rbp" => Register::RBP,
+         b"rsp" => Register::RSP,
+         b"rsi" => Register::RSI,
+         b"rdi" => Register::RDI,
+         b"r8"  => Register::R8,
+         b"r9"  => Register::R9,
+         b"r10" => Register::R10,
+         b"r11" => Register::R11,
+         b"r12" => Register::R12,
+         b"r13" => Register::R13,
+         b"r14" => Register::R14,
+         b"r15" => Register::R15,
+         _      => panic!("Unknown register."),
+      }
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////
 // top level parser
 ///////////////////////////////////////////////////////////////////////
