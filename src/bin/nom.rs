@@ -35,11 +35,12 @@ impl<'a> Line<'a> {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Operand {
-    Register(String),
-    RegisterPair(String, String),
+    Register(Register),
+    RegisterPair(Register, Register),
     // strings, literals, etc
 }
 
+#[derive(Debug, PartialEq, Eq)]
 enum Register {
    RAX, RBX, RCX, RDX, RBP, RSP, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15
 }
@@ -151,7 +152,7 @@ named!( operands<Operand>,
 );
 
 named!(operand_one_register<Operand>,
-   chain!(register, || Operand::Register("Test".to_string()))
+   chain!(r: register, || Operand::Register(Register::from_bytes(r)))
 );
 
 named!(operand_register_pair<Operand>,
@@ -161,8 +162,8 @@ named!(operand_register_pair<Operand>,
        char!(',') ~
        space? ~
        r1: register,
-       || Operand::RegisterPair(String::from_utf8_lossy(r0).into_owned(),
-                                String::from_utf8_lossy(r1).into_owned()))
+       || Operand::RegisterPair(Register::from_bytes(r0),
+                                Register::from_bytes(r1)))
 );
 
 ///////////////////////////////////////////////////////////////////////
@@ -208,7 +209,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use nom::IResult;
-    use super::{Operand, Line, line_asm};
+    use super::{Register, Operand, Line, line_asm};
     fn wrap_done<'a>(label: Option<&'a [u8]>,
                  instructions: Option<&'a [u8]>,
                  operand: Option<Operand>,
@@ -238,7 +239,7 @@ mod tests {
     fn test_instruction_operand() {
         assert_eq!(line_asm(b"mov rax,rbx ; instruction\n"),
                    wrap_done(None, Some(b"mov"),
-                             Some(Operand::RegisterPair("rax".to_string(), "rbx".to_string())),
+                             Some(Operand::RegisterPair(Register::RAX, Register::RBX)),
                              Some(b"instruction") ));
     }
 
@@ -252,7 +253,7 @@ mod tests {
     fn test_label_instruction_operand() {
         assert_eq!(line_asm(b"start: mov rax,rbx ; instruction\n"),
                    wrap_done(Some(b"start"), Some(b"mov"),
-                             Some(Operand::RegisterPair("rax".to_string(), "rbx".to_string())),
+                             Some(Operand::RegisterPair(Register::RAX, Register::RBX)),
                              Some(b"instruction") ));
     }
 }
