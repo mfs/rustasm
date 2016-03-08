@@ -154,10 +154,10 @@ named!( line_label_instruction_operands<Line>,
 
 // operands TODO need to handle spaces, strings, etc
 named!( operands<Operand>,
-    alt!(operand_register_pair | operand_one_register)
+    alt!(operand_register_pair | operand_register)
 );
 
-named!(operand_one_register<Operand>,
+named!(operand_register<Operand>,
    chain!(r: register, || Operand::Register(Register::from_bytes(r)))
 );
 
