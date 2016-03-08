@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate nom;
 
+use std::io::BufReader;
+use std::io::BufRead;
+use std::fs::File;
 use std::str;
 use nom::{space, is_alphanumeric, line_ending};
 
@@ -190,16 +193,11 @@ named!(register, alt!(
 
 fn main() {
 
-    let lines = vec![
-        "; comment only line\n",
-        "start                        ; (1) label only\n",
-        "start mov    st1,st0         ; (2) this sets st1 := st0\n",
-        "start: syscall                ; (3) perform syscall\n",
-        "mov    st1,st0               ; (4) this sets st1 := st0\n",
-        "syscall                      ; (5) perform syscall\n",
-    ];
+    let f = File::open("asm/hello_world.asm").unwrap();
+    let reader = BufReader::new(f);
 
-    for line in lines {
+    for line in reader.lines() {
+        let line = line.unwrap();
         let asm = line_asm(line.as_bytes());
         println!("{:#?}", asm);
     }
