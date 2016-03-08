@@ -102,21 +102,23 @@ named!( line_comment<Line>,
 
 named!( line_instruction_operands<Line>,
     chain!(
+        space? ~
         instruction: instruction ~
         space? ~
         operands: operands? ~
         space? ~
-        comment: comment ~
+        comment: comment? ~
         line_ending,
         || { Line::new( None,
                         Some(instruction),
                         operands,
-                        Some(comment)) }
+                        comment) }
     )
 );
 
 named!( line_label<Line>,
     chain!(
+        space? ~
         label: label ~
         space ~
         comment: comment ~
@@ -130,6 +132,7 @@ named!( line_label<Line>,
 
 named!( line_label_instruction_operands<Line>,
     chain!(
+        space? ~
         label: label ~
         space? ~
         instruction: instruction ~
@@ -197,7 +200,8 @@ fn main() {
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
-        let line = line.unwrap();
+        let mut line = line.unwrap();
+        line.push('\n');
         let asm = line_asm(line.as_bytes());
         println!("{:#?}", asm);
     }
@@ -253,5 +257,11 @@ mod tests {
                    wrap_done(Some(b"start"), Some(b"mov"),
                              Some(Operand::RegisterPair(Register::RAX, Register::RBX)),
                              Some(b"instruction") ));
+    }
+
+    #[test]
+    fn test_space_instruction() {
+        assert_eq!(line_asm(b"    syscall\n"),
+                   wrap_done(None, Some(b"syscall"), None, None ));
     }
 }
