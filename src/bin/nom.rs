@@ -47,31 +47,31 @@ enum Operand {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Register {
-   RAX, RBX, RCX, RDX, RBP, RSP, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15
+    RAX, RBX, RCX, RDX, RBP, RSP, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15
 }
 
 impl Register {
-   fn from_bytes(x: &[u8]) -> Register {
-      match x {
-         b"rax" => Register::RAX,
-         b"rbx" => Register::RBX,
-         b"rcx" => Register::RCX,
-         b"rdx" => Register::RDX,
-         b"rbp" => Register::RBP,
-         b"rsp" => Register::RSP,
-         b"rsi" => Register::RSI,
-         b"rdi" => Register::RDI,
-         b"r8"  => Register::R8,
-         b"r9"  => Register::R9,
-         b"r10" => Register::R10,
-         b"r11" => Register::R11,
-         b"r12" => Register::R12,
-         b"r13" => Register::R13,
-         b"r14" => Register::R14,
-         b"r15" => Register::R15,
-         _      => panic!("Unknown register."),
-      }
-   }
+    fn from_bytes(x: &[u8]) -> Register {
+        match x {
+            b"rax" => Register::RAX,
+            b"rbx" => Register::RBX,
+            b"rcx" => Register::RCX,
+            b"rdx" => Register::RDX,
+            b"rbp" => Register::RBP,
+            b"rsp" => Register::RSP,
+            b"rsi" => Register::RSI,
+            b"rdi" => Register::RDI,
+            b"r8"  => Register::R8,
+            b"r9"  => Register::R9,
+            b"r10" => Register::R10,
+            b"r11" => Register::R11,
+            b"r12" => Register::R12,
+            b"r13" => Register::R13,
+            b"r14" => Register::R14,
+            b"r15" => Register::R15,
+            _      => panic!("Unknown register."),
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -160,18 +160,18 @@ named!( operands<Operand>,
 );
 
 named!(operand_register<Operand>,
-   chain!(r: register, || Operand::Register(Register::from_bytes(r)))
+    chain!(r: register, || Operand::Register(Register::from_bytes(r)))
 );
 
 named!(operand_register_pair<Operand>,
-   chain!(
-       r0: register ~
-       space? ~
-       char!(',') ~
-       space? ~
-       r1: register,
-       || Operand::RegisterPair(Register::from_bytes(r0),
-                                Register::from_bytes(r1)))
+    chain!(
+        r0: register ~
+        space? ~
+        char!(',') ~
+        space? ~
+        r1: register,
+        || Operand::RegisterPair(Register::from_bytes(r0),
+                                 Register::from_bytes(r1)))
 );
 
 named!(operand_register_immediate<Operand>,
