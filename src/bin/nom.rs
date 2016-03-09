@@ -30,7 +30,7 @@ impl<'a> Line<'a> {
         Line {
             label: label.map(|x| str::from_utf8(x).unwrap()),
             instruction: instruction.map(|x| str::from_utf8(x).unwrap()),
-            operand: operands, //.map(|x| str::from_utf8(x).unwrap().trim()),
+            operand: operands,
             comment: comment.map(|x| str::from_utf8(x).unwrap().trim()),
         }
     }
@@ -154,7 +154,6 @@ named!( line_label_instruction_operands<Line>,
 // intermediate parsers
 ///////////////////////////////////////////////////////////////////////
 
-// operands TODO need to handle spaces, strings, etc
 named!( operands<Operand>,
     alt!(operand_register_pair | operand_register_immediate | operand_register)
 );
