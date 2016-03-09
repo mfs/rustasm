@@ -5,7 +5,8 @@ use std::io::BufReader;
 use std::io::BufRead;
 use std::fs::File;
 use std::str;
-use nom::{space, is_alphanumeric, line_ending};
+use std::str::FromStr;
+use nom::{digit, space, is_alphanumeric, line_ending};
 
 // types of input lines these can all have comments too.
 // empty
@@ -40,6 +41,7 @@ impl<'a> Line<'a> {
 enum Operand {
     Register(Register),
     RegisterPair(Register, Register),
+    RegisterImmediate(Register, u64),
     // strings, literals, etc
 }
 
@@ -154,7 +156,7 @@ named!( line_label_instruction_operands<Line>,
 
 // operands TODO need to handle spaces, strings, etc
 named!( operands<Operand>,
-    alt!(operand_register_pair | operand_register)
+    alt!(operand_register_pair | operand_register_immediate | operand_register)
 );
 
 named!(operand_register<Operand>,
@@ -172,6 +174,17 @@ named!(operand_register_pair<Operand>,
                                 Register::from_bytes(r1)))
 );
 
+named!(operand_register_immediate<Operand>,
+    chain!(
+        r: register ~
+        space? ~
+        char!(',') ~
+        space? ~
+        i: integer,
+        || Operand::RegisterImmediate(Register::from_bytes(r), i)
+    )
+);
+
 ///////////////////////////////////////////////////////////////////////
 // base parsers
 ///////////////////////////////////////////////////////////////////////
@@ -184,6 +197,17 @@ named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
 
 // labels TODO don't allow numeric first char
 named!( label, terminated!(take_while!( is_alphanumeric ), opt!(char!(':'))) );
+
+// integer - base 10
+named!( integer<u64>,
+    map_res!(
+        map_res!(
+            digit,
+            str::from_utf8
+        ),
+        FromStr::from_str
+    )
+);
 
 // registers TODO segment, xmss, etc.
 named!(register, alt!(
