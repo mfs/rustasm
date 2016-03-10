@@ -196,12 +196,12 @@ named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
 
 // labels TODO still need to allow other chars in take_while
 named!(label,
-    recognize!(
-        delimited!(
-            alt!(alpha | tag!(".") | tag!("_") | tag!("?")),
-            take_while!( is_alphanumeric ),
-            opt!(tag!(":"))
-)));
+    terminated!(
+        recognize!(
+            preceded!(
+                alt!(alpha | tag!(".") | tag!("_") | tag!("?")),
+                take_while!( is_alphanumeric ))),
+        opt!(tag!(":"))));
 
 // integer - base 10
 named!( integer<u64>,
