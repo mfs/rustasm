@@ -6,7 +6,7 @@ use std::io::BufRead;
 use std::fs::File;
 use std::str;
 use std::str::FromStr;
-use nom::{digit, space, is_alphanumeric, line_ending};
+use nom::{alpha, digit, space, is_alphanumeric, line_ending};
 
 // types of input lines these can all have comments too.
 // empty
@@ -122,13 +122,13 @@ named!( line_label<Line>,
     chain!(
         space? ~
         label: label ~
-        space ~
-        comment: comment ~
+        space? ~
+        comment: comment? ~
         line_ending,
         || { Line::new( Some(label),
                         None,
                         None,
-                        Some(comment)) }
+                        comment) }
     )
 );
 
@@ -194,8 +194,14 @@ named!( comment, preceded!( char!( ';' ), take_until!( b"\n" ) ) );
 // instruction TODO need to add all instructions
 named!( instruction, alt!( tag!( "mov" ) | tag!( "syscall" ) ) );
 
-// labels TODO don't allow numeric first char
-named!( label, terminated!(take_while!( is_alphanumeric ), opt!(char!(':'))) );
+// labels TODO still need to allow other chars in take_while
+named!(label,
+    recognize!(
+        delimited!(
+            alt!(alpha | tag!(".") | tag!("_") | tag!("?")),
+            take_while!( is_alphanumeric ),
+            opt!(tag!(":"))
+)));
 
 // integer - base 10
 named!( integer<u64>,
