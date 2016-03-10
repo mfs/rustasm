@@ -6,7 +6,7 @@ use std::io::BufRead;
 use std::fs::File;
 use std::str;
 use std::str::FromStr;
-use nom::{alpha, digit, space, is_alphanumeric, line_ending};
+use nom::{alpha, is_alphabetic, digit, space, is_alphanumeric, line_ending};
 
 // types of input lines these can all have comments too.
 // empty
@@ -35,6 +35,11 @@ impl<'a> Line<'a> {
         }
     }
 
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Directive {
+    Section(String)
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -90,6 +95,19 @@ named!( line_asm<Line>,
 ///////////////////////////////////////////////////////////////////////
 // per line parsers
 ///////////////////////////////////////////////////////////////////////
+
+named!( directive_section<Directive>,
+    chain!(
+        space? ~
+        tag!("section") ~
+        space ~
+        s: take_while!(is_alphabetic) ~
+        space? ~
+        line_ending,
+        || {  Directive::Section(String::from_utf8_lossy(s).into_owned()) }
+    )
+);
+
 
 named!( line_comment<Line>,
     chain!(
