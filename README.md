@@ -1,5 +1,7 @@
 ## RUSTASM
 
+[![Build Status](https://travis-ci.org/mfs/rustasm.svg?branch=master)](https://travis-ci.org/mfs/rustasm)
+
 I'm currently writing an [Intel 4004 emulator][box] and have started writing an
 assembler for it. Unfortunately while I have written a compiler before I have
 not written an assembler. I was going to just jump straight into it however have
