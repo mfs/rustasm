@@ -42,6 +42,7 @@ enum Operand {
     Register(Register),
     RegisterPair(Register, Register),
     RegisterImmediate(Register, u64),
+    RegisterSymbol(Register, String),
     // strings, literals, etc
 }
 
@@ -155,7 +156,10 @@ named!( line_label_instruction_operands<Line>,
 ///////////////////////////////////////////////////////////////////////
 
 named!( operands<Operand>,
-    alt!(operand_register_pair | operand_register_immediate | operand_register)
+    alt!(operand_register_pair |
+         operand_register_immediate |
+         operand_register_label |
+         operand_register)
 );
 
 named!(operand_register<Operand>,
@@ -181,6 +185,18 @@ named!(operand_register_immediate<Operand>,
         space? ~
         i: integer,
         || Operand::RegisterImmediate(Register::from_bytes(r), i)
+    )
+);
+
+named!(operand_register_label<Operand>,
+    chain!(
+        r: register ~
+        space? ~
+        char!(',') ~
+        space? ~
+        l: label,
+        || Operand::RegisterSymbol(Register::from_bytes(r),
+                                   String::from_utf8_lossy(l).into_owned())
     )
 );
 
