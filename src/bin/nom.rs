@@ -14,6 +14,11 @@ use nom::{alpha, is_alphabetic, digit, space, is_alphanumeric, line_ending};
 // instruction operands?
 // label instructions operands?
 
+enum Src<'a> {
+    Line(Line<'a>),
+    Directive(Directive),
+}
+
 #[derive(Debug, PartialEq, Eq)]
 struct Line<'a> {
     label: Option<&'a str>,
@@ -83,6 +88,13 @@ impl Register {
 ///////////////////////////////////////////////////////////////////////
 // top level parser
 ///////////////////////////////////////////////////////////////////////
+
+named!( top<Src>,
+        alt!(
+            chain!(d: directive_section, || { Src::Directive(d) } ) |
+            chain!(l: line_asm, || { Src::Line(l) } )
+        )
+);
 
 named!( line_asm<Line>,
     alt!( line_comment |
