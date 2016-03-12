@@ -45,7 +45,8 @@ impl<'a> Line<'a> {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Directive {
-    Section(String)
+    Section(String),
+    Global(String),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -93,6 +94,7 @@ impl Register {
 named!( top<Src>,
         alt!(
             chain!(d: directive_section, || { Src::Directive(d) } ) |
+            chain!(d: directive_global, || { Src::Directive(d) } ) |
             chain!(l: line_asm, || { Src::Line(l) } )
         )
 );
@@ -121,6 +123,17 @@ named!( directive_section<Directive>,
     )
 );
 
+named!( directive_global<Directive>,
+    chain!(
+        space? ~
+        tag!("global") ~
+        space ~
+        l: label ~
+        space? ~
+        line_ending,
+        || {  Directive::Global(String::from_utf8_lossy(l).into_owned()) }
+    )
+);
 
 named!( line_comment<Line>,
     chain!(
