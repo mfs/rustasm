@@ -14,6 +14,7 @@ use nom::{alpha, is_alphabetic, digit, space, is_alphanumeric, line_ending};
 // instruction operands?
 // label instructions operands?
 
+#[derive(Debug, PartialEq, Eq)]
 enum Src<'a> {
     Line(Line<'a>),
     Directive(Directive),
@@ -113,7 +114,7 @@ named!( directive_section<Directive>,
         space? ~
         tag!("section") ~
         space ~
-        s: take_while!(is_alphabetic) ~
+        s: section ~
         space? ~
         line_ending,
         || {  Directive::Section(String::from_utf8_lossy(s).into_owned()) }
@@ -249,6 +250,12 @@ named!(label,
                 take_while!( is_alphanumeric ))),
         opt!(tag!(":"))));
 
+named!(section,
+    recognize!(
+        preceded!(
+            opt!(tag!(".")),
+            take_while!(is_alphabetic))));
+
 // integer - base 10
 named!( integer<u64>,
     map_res!(
@@ -277,7 +284,7 @@ fn main() {
     for line in reader.lines() {
         let mut line = line.unwrap();
         line.push('\n');
-        let asm = line_asm(line.as_bytes());
+        let asm = top(line.as_bytes());
         println!("{:#?}", asm);
     }
 
