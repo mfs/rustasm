@@ -47,6 +47,7 @@ impl<'a> Line<'a> {
 enum Directive {
     Section(String),
     Global(String),
+    Data(String, Option<String>), // Optional label
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -93,8 +94,7 @@ impl Register {
 
 named!( top<Src>,
         alt!(
-            chain!(d: directive_section, || { Src::Directive(d) } ) |
-            chain!(d: directive_global, || { Src::Directive(d) } ) |
+            chain!(d: directive, || { Src::Directive(d) } ) |
             chain!(l: line_asm, || { Src::Line(l) } )
         )
 );
@@ -106,6 +106,14 @@ named!( line_asm<Line>,
           line_label_instruction_operands
     )
 );
+
+named!( directive<Directive>,
+    alt!( directive_section |
+          directive_global |
+          directive_data
+    )
+);
+
 
 ///////////////////////////////////////////////////////////////////////
 // per line parsers
@@ -120,6 +128,21 @@ named!( directive_section<Directive>,
         space? ~
         line_ending,
         || {  Directive::Section(String::from_utf8_lossy(s).into_owned()) }
+    )
+);
+
+named!( directive_data<Directive>,
+    chain!(
+        space? ~
+        l: label? ~
+        space ~
+        tag!("db") ~ // TODO: add dd, dq, etc
+        space ~
+        data: delimited!(tag!("\""), take_until!("\""), tag!("\"") ) ~
+        space? ~
+        line_ending,
+        || {  Directive::Data(String::from_utf8_lossy(data).into_owned(),
+                              l.map( |x| String::from_utf8_lossy(x).into_owned()  )) }
     )
 );
 
