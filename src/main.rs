@@ -1,5 +1,6 @@
 mod symbol_table;
 mod opcode_table;
+mod elf64;
 
 use std::collections::HashMap;
 use symbol_table::SymbolTable;
