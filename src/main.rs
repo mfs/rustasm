@@ -2,6 +2,11 @@ mod symbol_table;
 mod opcode_table;
 mod elf64;
 
+use std::env;
+use std::process;
+use std::io::BufReader;
+use std::io::BufRead;
+use std::fs::File;
 use std::collections::HashMap;
 use symbol_table::SymbolTable;
 use opcode_table::{OpCodeTable, OpCodeType, Mnemonic};
@@ -52,6 +57,16 @@ impl Assembler {
 
 
 fn main() {
+    let input_file = match env::args().nth(1) {
+        Some(x) => x,
+        None    => {
+            println!("usage: rustasm <input_file>");
+            process::exit(1);
+        },
+    };
+
+    let file = File::open(input_file).unwrap();
+    let reader = BufReader::new(file);
 
     let mut assembler = Assembler::new();
 
