@@ -1,3 +1,7 @@
+// Simple Elf64 generator
+// start with generating a relocatable object file
+// https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+
 type Elf64Addr = u64;
 type Elf64Off = u64;
 type Elf64Half = u16;
@@ -36,6 +40,7 @@ struct SectionHeader {
     entsize: Elf64Xword,
 }
 
+// this won't be needed to output a relocatable file
 struct ProgramHeader {
     stype: Elf64Word,
     flags: Elf64Word,
@@ -45,4 +50,9 @@ struct ProgramHeader {
     filesz: Elf64Xword,
     memsz: Elf64Xword,
     align: Elf64Xword,
+}
+
+struct Elf64 {
+    header: FileHeader,
+    // sections, etc
 }
