@@ -37,10 +37,16 @@ impl Assembler {
         a
     }
 
-    fn pass1(&mut self) {
-        self.list(Mnemonic{ mnemonic: "syscall", mnemonic_type: OpCodeType::None });
-        self.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg32, Imm32) });
-        self.list(Mnemonic{ mnemonic: "mov", mnemonic_type: OpCodeType::Type(Reg64, Imm64) });
+    fn pass1(&mut self, f: &File) {
+
+        let reader = BufReader::new(f);
+
+        for line in reader.lines() {
+            let mut line = line.unwrap();
+            line.push('\n');
+            let asm = parser::top(line.as_bytes());
+            println!("{:#?}", asm);
+        }
     }
 
     fn pass2(&mut self) {
@@ -54,9 +60,6 @@ impl Assembler {
                  mnemonic.mnemonic, op.code, op.length);
     }
 
-    fn lexer(&self, line: &str)  {
-        // TODO
-    }
 }
 
 
@@ -70,14 +73,11 @@ fn main() {
     };
 
     let file = File::open(input_file).unwrap();
-    let reader = BufReader::new(file);
+    //let reader = BufReader::new(file);
 
     let mut assembler = Assembler::new();
 
-    assembler.pass1();
+    assembler.pass1(&file);
     assembler.pass2();
 
-    // label:    instruction operands        ; comment
-    let line = "fadd    st1,st0         ; this sets st1 := st1 + st0";
-    assembler.lexer(line)
 }

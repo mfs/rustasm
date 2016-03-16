@@ -10,7 +10,7 @@ use nom::{alpha, is_alphabetic, digit, space, is_alphanumeric, line_ending};
 // label instructions operands?
 
 #[derive(Debug, PartialEq, Eq)]
-enum Src<'a> {
+pub enum Src<'a> {
     Line(Line<'a>),
     Directive(Directive),
 }
@@ -87,7 +87,7 @@ impl Register {
 // top level parser
 ///////////////////////////////////////////////////////////////////////
 
-named!( top<Src>,
+named!( pub top<Src>,
         alt!(
             chain!(d: directive, || { Src::Directive(d) } ) |
             chain!(l: line_asm, || { Src::Line(l) } )
