@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate nom;
+
+mod parser;
 mod symbol_table;
 mod opcode_table;
 mod elf64;
