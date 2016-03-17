@@ -15,6 +15,9 @@ use std::collections::HashMap;
 use symbol_table::SymbolTable;
 use opcode_table::{OpCodeTable, OpCodeType, Mnemonic};
 use opcode_table::OperandType::*;
+use nom::IResult::*;
+use parser::Src;
+use parser::Directive;
 
 struct Assembler {
     _location_counter: u64,
@@ -45,7 +48,12 @@ impl Assembler {
             let mut line = line.unwrap();
             line.push('\n');
             let asm = parser::top(line.as_bytes());
-            println!("{:#?}", asm);
+
+            match asm {
+                Done(_, Src::Directive(Directive::Global(x))) => self.directive_global(x),
+                Done(_, Src::Directive(Directive::Section(x))) => self.directive_section(x),
+                _ => println!("{:#?}", asm),
+            }
         }
     }
 
@@ -60,6 +68,13 @@ impl Assembler {
                  mnemonic.mnemonic, op.code, op.length);
     }
 
+    fn directive_global(&self, label: String ) {
+        println!("directive::global::{}", label);
+    }
+
+    fn directive_section(&self, section: String ) {
+        println!("directive::section::{}", section);
+    }
 }
 
 

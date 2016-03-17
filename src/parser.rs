@@ -39,7 +39,7 @@ impl<'a> Line<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-enum Directive {
+pub enum Directive {
     Section(String),
     Global(String),
     Data(String, Option<String>), // Optional label
