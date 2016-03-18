@@ -50,6 +50,7 @@ impl Assembler {
             let asm = parser::top(line.as_bytes());
 
             match asm {
+                Done(_, Src::Directive(Directive::Data(d, l))) => self.directive_data(d, l),
                 Done(_, Src::Directive(Directive::Global(x))) => self.directive_global(x),
                 Done(_, Src::Directive(Directive::Section(x))) => self.directive_section(x),
                 _ => println!("{:#?}", asm),
@@ -74,6 +75,10 @@ impl Assembler {
 
     fn directive_section(&self, section: String ) {
         println!("directive::section::{}", section);
+    }
+
+    fn directive_data(&self, data: String, label: Option<String>) {
+        println!("directive::data::{} label = {:?}", data, label);
     }
 }
 
