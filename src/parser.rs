@@ -13,6 +13,7 @@ use nom::{alpha, is_alphabetic, digit, space, is_alphanumeric, line_ending};
 pub enum Src<'a> {
     Line(Line<'a>),
     Directive(Directive),
+    Blank,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -89,6 +90,7 @@ impl Register {
 
 named!( pub top<Src>,
         alt!(
+            chain!(space? ~ line_ending, || { Src::Blank } ) |
             chain!(d: directive, || { Src::Directive(d) } ) |
             chain!(l: line_asm, || { Src::Line(l) } )
         )
