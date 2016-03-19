@@ -51,9 +51,7 @@ impl Assembler {
 
             match asm {
                 Done(_, Src::Blank) => {},
-                Done(_, Src::Directive(Directive::Data(d, l))) => self.directive_data(d, l),
-                Done(_, Src::Directive(Directive::Global(x))) => self.directive_global(x),
-                Done(_, Src::Directive(Directive::Section(x))) => self.directive_section(x),
+                Done(_, Src::Directive(d)) => self.directive(d),
                 _ => println!("{:#?}", asm),
             }
         }
@@ -70,6 +68,16 @@ impl Assembler {
                  mnemonic.mnemonic, op.code, op.length);
     }
 
+    fn directive(&self, directive: Directive) {
+        match directive {
+            Directive::Data(d, l) => self.directive_data(d, l),
+            Directive::Global(x) => self.directive_global(x),
+            Directive::Section(x) => self.directive_section(x),
+        }
+    }
+
+    // ==================== directives ====================
+
     fn directive_global(&self, label: String ) {
         println!("directive::global::{}", label);
     }
@@ -81,6 +89,9 @@ impl Assembler {
     fn directive_data(&self, data: String, label: Option<String>) {
         println!("directive::data::{} label = {:?}", data, label);
     }
+
+    // ==================== instructions ====================
+    // TODO
 }
 
 
