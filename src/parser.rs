@@ -3,33 +3,34 @@ use std::str;
 use std::str::FromStr;
 use nom::{alpha, is_alphabetic, digit, space, is_alphanumeric, line_ending};
 
-// types of input lines these can all have comments too.
-// empty
-// label
-// instruction operands?
-// label instructions operands?
+
+// Line
+// |- Directive
+// |- Source
+// |- Blank
+// |- ...
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum Src<'a> {
-    Line(Line<'a>),
+pub enum Line<'a> {
+    Source(Source<'a>),
     Directive(Directive),
     Blank,
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Line<'a> {
+struct Source<'a> {
     label: Option<&'a str>,
     instruction: Option<&'a str>,
     operand: Option<Operand>,
     comment: Option<&'a str>
 }
 
-impl<'a> Line<'a> {
+impl<'a> Source<'a> {
     fn new(label: Option<&'a [u8]>,
            instruction: Option<&'a [u8]>,
            operands: Option<Operand>,
-           comment: Option<&'a [u8]>) -> Line<'a> {
-        Line {
+           comment: Option<&'a [u8]>) -> Source<'a> {
+        Source {
             label: label.map(|x| str::from_utf8(x).unwrap()),
             instruction: instruction.map(|x| str::from_utf8(x).unwrap()),
             operand: operands,
@@ -88,15 +89,15 @@ impl Register {
 // top level parser
 ///////////////////////////////////////////////////////////////////////
 
-named!( pub top<Src>,
+named!( pub top<Line>,
         alt!(
-            chain!(space? ~ line_ending, || { Src::Blank } ) |
-            chain!(d: directive, || { Src::Directive(d) } ) |
-            chain!(l: line_asm, || { Src::Line(l) } )
+            chain!(space? ~ line_ending, || { Line::Blank } ) |
+            chain!(d: directive, || { Line::Directive(d) } ) |
+            chain!(l: line_asm, || { Line::Source(l) } )
         )
 );
 
-named!( line_asm<Line>,
+named!( line_asm<Source>,
     alt!( line_comment |
           line_instruction_operands |
           line_label |
@@ -155,19 +156,19 @@ named!( directive_global<Directive>,
     )
 );
 
-named!( line_comment<Line>,
+named!( line_comment<Source>,
     chain!(
         space? ~
         comment: comment ~
         line_ending,
-        || { Line::new( None,
+        || { Source::new( None,
                         None,
                         None,
                         Some(comment)) }
     )
 );
 
-named!( line_instruction_operands<Line>,
+named!( line_instruction_operands<Source>,
     chain!(
         space? ~
         instruction: instruction ~
@@ -176,28 +177,28 @@ named!( line_instruction_operands<Line>,
         space? ~
         comment: comment? ~
         line_ending,
-        || { Line::new( None,
+        || { Source::new( None,
                         Some(instruction),
                         operands,
                         comment) }
     )
 );
 
-named!( line_label<Line>,
+named!( line_label<Source>,
     chain!(
         space? ~
         label: label ~
         space? ~
         comment: comment? ~
         line_ending,
-        || { Line::new( Some(label),
+        || { Source::new( Some(label),
                         None,
                         None,
                         comment) }
     )
 );
 
-named!( line_label_instruction_operands<Line>,
+named!( line_label_instruction_operands<Source>,
     chain!(
         space? ~
         label: label ~
@@ -208,7 +209,7 @@ named!( line_label_instruction_operands<Line>,
         space? ~
         comment: comment ~
         line_ending,
-        || { Line::new( Some(label),
+        || { Source::new( Some(label),
                         Some(instruction),
                         operands,
                         Some(comment)) }
@@ -312,12 +313,12 @@ named!(register, alt!(
 #[cfg(test)]
 mod tests {
     use nom::IResult;
-    use super::{Register, Operand, Line, line_asm};
+    use super::{Register, Operand, Source, line_asm};
     fn wrap_done<'a>(label: Option<&'a [u8]>,
                  instructions: Option<&'a [u8]>,
                  operand: Option<Operand>,
-                 comment: Option<&'a [u8]>) -> IResult<&'a [u8], Line<'a> > {
-        IResult::Done(&b""[..], Line::new( label, instructions, operand, comment))
+                 comment: Option<&'a [u8]>) -> IResult<&'a [u8], Source<'a> > {
+        IResult::Done(&b""[..], Source::new( label, instructions, operand, comment))
     }
 
     #[test]

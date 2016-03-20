@@ -16,7 +16,7 @@ use symbol_table::SymbolTable;
 use opcode_table::{OpCodeTable, OpCodeType, Mnemonic};
 use opcode_table::OperandType::*;
 use nom::IResult::*;
-use parser::Src;
+use parser::Line;
 use parser::Directive;
 
 struct Assembler {
@@ -50,8 +50,8 @@ impl Assembler {
             let asm = parser::top(line.as_bytes());
 
             match asm {
-                Done(_, Src::Blank) => {},
-                Done(_, Src::Directive(d)) => self.directive(d),
+                Done(_, Line::Blank) => {},
+                Done(_, Line::Directive(d)) => self.directive(d),
                 _ => println!("{:#?}", asm),
             }
         }
