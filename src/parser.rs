@@ -18,7 +18,7 @@ pub enum Line<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Source<'a> {
+pub struct Source<'a> {
     label: Option<&'a str>,
     instruction: Option<&'a str>,
     operand: Option<Operand>,

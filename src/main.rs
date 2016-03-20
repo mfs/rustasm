@@ -16,6 +16,7 @@ use symbol_table::SymbolTable;
 use opcode_table::{OpCodeTable, OpCodeType, Mnemonic};
 use opcode_table::OperandType::*;
 use nom::IResult::*;
+use parser::Source;
 use parser::Line;
 use parser::Directive;
 
@@ -52,7 +53,8 @@ impl Assembler {
             match asm {
                 Done(_, Line::Blank) => {},
                 Done(_, Line::Directive(d)) => self.directive(d),
-                _ => println!("{:#?}", asm),
+                Done(_, Line::Source(s)) => self.source(s),
+                _ => panic!("Error: {:#?}", asm),
             }
         }
     }
@@ -74,6 +76,10 @@ impl Assembler {
             Directive::Global(x) => self.directive_global(x),
             Directive::Section(x) => self.directive_section(x),
         }
+    }
+
+    fn source(&self, source: Source) {
+        println!("{:#?}", source);
     }
 
     // ==================== directives ====================
