@@ -16,9 +16,7 @@ use symbol_table::SymbolTable;
 use opcode_table::{OpCodeTable, OpCodeType, Mnemonic};
 use opcode_table::OperandType::*;
 use nom::IResult::*;
-use parser::Source;
-use parser::Line;
-use parser::Directive;
+use parser::{Source, Line, Directive};
 
 struct Assembler {
     _location_counter: u64,
@@ -111,7 +109,6 @@ fn main() {
     };
 
     let file = File::open(input_file).unwrap();
-    //let reader = BufReader::new(file);
 
     let mut assembler = Assembler::new();
 
