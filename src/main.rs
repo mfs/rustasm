@@ -46,7 +46,7 @@ impl Assembler {
         for line in reader.lines() {
             let mut line = line.unwrap();
             line.push('\n');
-            let asm = parser::top(line.as_bytes());
+            let asm = parser::line(line.as_bytes());
 
             match asm {
                 Done(_, Line::Blank) => {},

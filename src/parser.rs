@@ -89,15 +89,15 @@ impl Register {
 // top level parser
 ///////////////////////////////////////////////////////////////////////
 
-named!( pub top<Line>,
+named!( pub line<Line>,
         alt!(
             chain!(space? ~ line_ending, || { Line::Blank } ) |
             chain!(d: directive, || { Line::Directive(d) } ) |
-            chain!(l: line_asm, || { Line::Source(l) } )
+            chain!(l: source, || { Line::Source(l) } )
         )
 );
 
-named!( line_asm<Source>,
+named!( source<Source>,
     alt!( line_comment |
           line_instruction_operands |
           line_label |
@@ -313,7 +313,7 @@ named!(register, alt!(
 #[cfg(test)]
 mod tests {
     use nom::IResult;
-    use super::{Register, Operand, Source, line_asm};
+    use super::{Register, Operand, Source, source};
     fn wrap_done<'a>(label: Option<&'a [u8]>,
                  instructions: Option<&'a [u8]>,
                  operand: Option<Operand>,
@@ -323,25 +323,25 @@ mod tests {
 
     #[test]
     fn test_comment() {
-        assert_eq!(line_asm(b"; a single comment\n"),
+        assert_eq!(source(b"; a single comment\n"),
                    wrap_done(None, None, None, Some(b"a single comment")));
     }
 
     #[test]
     fn test_comment_leading_whitespace() {
-        assert_eq!(line_asm(b" \t ; a single comment\n"),
+        assert_eq!(source(b" \t ; a single comment\n"),
                    wrap_done(None, None, None, Some(b"a single comment")));
     }
 
     #[test]
     fn test_instruction() {
-        assert_eq!(line_asm(b"syscall ; single instruction\n"),
+        assert_eq!(source(b"syscall ; single instruction\n"),
                    wrap_done(None, Some(b"syscall"), None, Some(b"single instruction") ));
     }
 
     #[test]
     fn test_instruction_operand() {
-        assert_eq!(line_asm(b"mov rax,rbx ; instruction\n"),
+        assert_eq!(source(b"mov rax,rbx ; instruction\n"),
                    wrap_done(None, Some(b"mov"),
                              Some(Operand::RegisterPair(Register::RAX, Register::RBX)),
                              Some(b"instruction") ));
@@ -349,13 +349,13 @@ mod tests {
 
     #[test]
     fn test_label_instruction() {
-        assert_eq!(line_asm(b"start: syscall ; instruction\n"),
+        assert_eq!(source(b"start: syscall ; instruction\n"),
                    wrap_done(Some(b"start"), Some(b"syscall"), None, Some(b"instruction") ));
     }
 
     #[test]
     fn test_label_instruction_operand() {
-        assert_eq!(line_asm(b"start: mov rax,rbx ; instruction\n"),
+        assert_eq!(source(b"start: mov rax,rbx ; instruction\n"),
                    wrap_done(Some(b"start"), Some(b"mov"),
                              Some(Operand::RegisterPair(Register::RAX, Register::RBX)),
                              Some(b"instruction") ));
@@ -363,7 +363,7 @@ mod tests {
 
     #[test]
     fn test_space_instruction() {
-        assert_eq!(line_asm(b"    syscall\n"),
+        assert_eq!(source(b"    syscall\n"),
                    wrap_done(None, Some(b"syscall"), None, None ));
     }
 }
