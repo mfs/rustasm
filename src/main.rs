@@ -19,7 +19,7 @@ use nom::IResult::*;
 use parser::{Source, Line, Directive};
 
 struct Assembler {
-    _location_counter: u64,
+    location_counter: HashMap<String, u64>,
     op_code_table: OpCodeTable,
     symbol_table: SymbolTable,
 }
@@ -27,10 +27,12 @@ struct Assembler {
 impl Assembler {
     fn new() -> Assembler {
         let mut a = Assembler {
-            _location_counter: 0,
+            location_counter: HashMap::new(),
             op_code_table: OpCodeTable::new(),
             symbol_table: SymbolTable::new(),
         };
+
+        a.location_counter.entry(".text".to_string()).or_insert(0);
 
         a.op_code_table.insert("syscall", OpCodeType::None, vec![0x5], 2);
         a.op_code_table.insert("mov", OpCodeType::Type(Reg32, Imm32), vec![0xb8], 5);
