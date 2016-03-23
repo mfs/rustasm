@@ -20,7 +20,7 @@ use parser::{Source, Line, Directive};
 
 struct Assembler {
     _location_counter: u64,
-    op_code_table: OpCodeTable, //HashMap<Mnemonic, OpCode>,
+    op_code_table: OpCodeTable,
     symbol_table: SymbolTable,
 }
 
